@@ -2,6 +2,7 @@ package com.happyapp.grrravity.moodtracker.Controller;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.ImageView;
@@ -10,13 +11,11 @@ import android.view.GestureDetector.OnGestureListener;
 
 import com.happyapp.grrravity.moodtracker.R;
 
-import static java.lang.System.out;
-
 public class MainActivity extends AppCompatActivity implements OnGestureListener {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private ImageView mSmileyView;
     private RelativeLayout mRelativeLayout;
-    private int mMood = 2;
     GestureDetector gestureDetector;
 
     @Override
@@ -24,9 +23,9 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        out.println("MainActivity::onCreate");
+        Log.d(TAG, "onCreate: ");
         initVars();
-        gestureDetector = new GestureDetector(MainActivity.this, MainActivity.this);
+        gestureDetector = new GestureDetector(this, this);
 
     }
 
@@ -35,41 +34,49 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         mRelativeLayout = findViewById(R.id.relativeLayout);
     }
 
-    public boolean onFling (MotionEvent motionEvent1, MotionEvent motionEvent2, float X, float Y) {
-
-        if(motionEvent1.getY() - motionEvent2.getY() > 50){
-
-            return true;
-        }
-
-        if(motionEvent2.getY() - motionEvent1.getY() > 50){
-
-            return true;
-        }
-        if(motionEvent1.getX() - motionEvent2.getX() > 50){
-            if (mMood > 3) {
-                mMood = 4;
-                changeBackground(mMood);
+    public boolean onFling(MotionEvent motionEvent1, MotionEvent motionEvent2, float X, float Y) {
+        int screenID = Preferences.getInstance(this).getSCREENID();
+        if (motionEvent1.getY() - motionEvent2.getY() > 50) {
+            if (screenID > 3) {
+                screenID = 4;
+                Preferences.getInstance(this).setScreenID(screenID);
+            } else {
+                screenID++;
+                Preferences.getInstance(this).setScreenID(screenID);
             }
-            else
-                mMood ++;
-            changeBackground(mMood);
+
+            Preferences.getInstance(this).setImageMood();
+            Preferences.getInstance(this).setBackgroundMood();
+            changeBackground();
             return true;
         }
 
-        if(motionEvent2.getX() - motionEvent1.getX() > 50) {
-            if (mMood < 1){
-                mMood = 0;
-                changeBackground(mMood);
+        if (motionEvent2.getY() - motionEvent1.getY() > 50) {
+            if (screenID < 1) {
+                screenID = 0;
+                Preferences.getInstance(this).setScreenID(screenID);
+            } else {
+                screenID--;
+                Preferences.getInstance(this).setScreenID(screenID);
             }
-            else
-                mMood --;
-            changeBackground(mMood);
+            Preferences.getInstance(this).setImageMood();
+            Preferences.getInstance(this).setBackgroundMood();
+            changeBackground();
+            return true;
+
+        }
+
+        if (motionEvent1.getX() - motionEvent2.getX() > 50) {
             return true;
         }
-        else {
 
-            return true ;
+        if (motionEvent2.getX() - motionEvent1.getX() > 50) {
+            return true;
+        }
+
+        else
+        {
+            return true;
         }
     }
 
@@ -119,63 +126,20 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         return false;
     }
 
-    public void changeBackground(int mood){
-        if (mood == 0){
-            mSmileyView .setImageResource(R.drawable.smileysad);
-            mRelativeLayout .setBackgroundColor(getResources().getColor(R.color.faded_red));
+    public void changeBackground() {
+        mSmileyView.setImageResource(getResources().getIdentifier(
+                "drawable/"+ Preferences.getInstance(this).getImage() ,
+                null, getApplicationContext().getPackageName()));
+        mRelativeLayout.setBackgroundColor(getResources().getIdentifier(
+                "values/color/"+ Preferences.getInstance(this).getBackground(),
+                null, getApplicationContext().getPackageName()));
         }
-        if (mood == 1){
-            mSmileyView .setImageResource(R.drawable.smileydisappointed);
-            mRelativeLayout .setBackgroundColor(getResources().getColor(R.color.warm_grey));
-        }
-        if (mood == 2){
-            mSmileyView .setImageResource(R.drawable.smileynormal);
-            mRelativeLayout .setBackgroundColor(getResources().getColor(R.color.cornflower_blue_65));
-        }
-        if (mood == 3 ){
-            mSmileyView .setImageResource(R.drawable.smileyhappy);
-            mRelativeLayout .setBackgroundColor(getResources().getColor(R.color.light_sage));
-        }
-        if (mood == 4){
-            mSmileyView .setImageResource(R.drawable.smileysuperhappy);
-            mRelativeLayout .setBackgroundColor(getResources().getColor(R.color.banana_yellow));
-        }
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        out.println("MainActivity::onStart()");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        out.println("MainActivity::onResume()");
-    }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        out.println("MainActivity::onPause()");
+        Log.d(TAG, "onPause :");
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        out.println("MainActivity::onStop()");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        out.println("MainActivity::onDestroy()");
-    }
 
 }
