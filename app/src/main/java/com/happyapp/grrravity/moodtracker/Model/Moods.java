@@ -56,4 +56,15 @@ public class Moods {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    @Override
+    public String toString(){
+        return "Moods{"+
+                "name ='" + name + '\'' +
+                ", drawableId = " + drawableId +
+                ", colorId = " + colorId +
+                ", index = " + index +
+                ", comment" + comment +
+                "}";
+    }
 }
