@@ -9,7 +9,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.view.GestureDetector.OnGestureListener;
 
+import com.happyapp.grrravity.moodtracker.Model.Moods;
 import com.happyapp.grrravity.moodtracker.R;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements OnGestureListener {
 
@@ -17,16 +20,25 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     private ImageView mSmileyView;
     private RelativeLayout mRelativeLayout;
     GestureDetector gestureDetector;
+    private MoodPreferences mPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mPref = MoodPreferences.getInstance(this);
 
         Log.d(TAG, "onCreate: ");
         initVars();
         gestureDetector = new GestureDetector(this, this);
+        initMoodList();
 
+    }
+
+    private void initMoodList() {
+        ArrayList<Moods> moods = new ArrayList<>();
+        // TODO mettre les valeurs aux moods. (moods.add etc)
+        Moods moods1 = new Moods();
     }
 
     private void initVars() {
@@ -35,32 +47,25 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     }
 
     public boolean onFling(MotionEvent motionEvent1, MotionEvent motionEvent2, float X, float Y) {
-        int screenID = Preferences.getInstance(this).getSCREENID();
+        int counter = 2;
         if (motionEvent1.getY() - motionEvent2.getY() > 50) {
-            if (screenID > 3) {
-                screenID = 4;
-                Preferences.getInstance(this).setScreenID(screenID);
+            if (counter > 3) {
+                counter = 4;
             } else {
-                screenID++;
-                Preferences.getInstance(this).setScreenID(screenID);
+                counter++;
             }
 
-            Preferences.getInstance(this).setImageMood();
-            Preferences.getInstance(this).setBackgroundMood();
             changeBackground();
             return true;
         }
 
         if (motionEvent2.getY() - motionEvent1.getY() > 50) {
-            if (screenID < 1) {
-                screenID = 0;
-                Preferences.getInstance(this).setScreenID(screenID);
+            if (counter < 1) {
+                counter = 0;
             } else {
-                screenID--;
-                Preferences.getInstance(this).setScreenID(screenID);
+                counter--;
             }
-            Preferences.getInstance(this).setImageMood();
-            Preferences.getInstance(this).setBackgroundMood();
+
             changeBackground();
             return true;
 
@@ -72,10 +77,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
         if (motionEvent2.getX() - motionEvent1.getX() > 50) {
             return true;
-        }
-
-        else
-        {
+        } else {
             return true;
         }
     }
@@ -126,14 +128,10 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         return false;
     }
 
-    public void changeBackground() {
-        mSmileyView.setImageResource(getResources().getIdentifier(
-                "drawable/"+ Preferences.getInstance(this).getImage() ,
-                null, getApplicationContext().getPackageName()));
-        mRelativeLayout.setBackgroundColor(getResources().getIdentifier(
-                "values/color/"+ Preferences.getInstance(this).getBackground(),
-                null, getApplicationContext().getPackageName()));
-        }
+    public void changeBackground(int drawableId, int colorId) {
+        mSmileyView.setImageResource(drawableId);
+        mRelativeLayout.setBackgroundColor(colorId);
+    }
 
     @Override
     protected void onPause() {
