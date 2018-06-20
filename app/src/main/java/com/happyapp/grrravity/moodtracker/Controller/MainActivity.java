@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.view.GestureDetector.OnGestureListener;
@@ -15,30 +16,47 @@ import com.happyapp.grrravity.moodtracker.R;
 public class MainActivity extends AppCompatActivity implements OnGestureListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    //layout-relative vars
     private ImageView mSmileyView;
+    private ImageButton mImageButtonComment, mImageButtonHistory;
     private RelativeLayout mRelativeLayout;
+
+    //Mood object relative vars
     private Moods[] mMoodTable;
-    GestureDetector gestureDetector;
     private Moods mMoods;
+
+    //SharedPrefs vars
     private MoodPreferences mPref;
 
+    //gesture detector
+    GestureDetector gestureDetector;
+
+    //other vars
     private int counter = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         mPref = MoodPreferences.getInstance(this);
+        gestureDetector = new GestureDetector(this, this);
 
         Log.d(TAG, "onCreate: ");
+
+        //initiation of xml vars
         initVars();
+
+        //initiation of mood list
         initMoodList();
-        gestureDetector = new GestureDetector(this, this);
+
 
 
     }
 
     private void initMoodList() {
+        //Creating every moods with their assets (background, drawable, comment and name
         mMoodTable = new Moods[]{
                 new Moods("Sad",
                         R.drawable.smileysad, R.color.color_sad, 0,
@@ -60,10 +78,14 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     }
 
     private void initVars() {
+        //Connecting layout element by id
         mSmileyView = findViewById(R.id.smileyImage);
         mRelativeLayout = findViewById(R.id.relativeLayout);
+        mImageButtonComment = findViewById(R.id.comment_button);
+        mImageButtonHistory = findViewById(R.id.history_button);
     }
 
+    // Method to change image and background when user moves up or down
     public boolean onFling(MotionEvent motionEvent1, MotionEvent motionEvent2, float X, float Y) {
 
         if (motionEvent1.getY() - motionEvent2.getY() > 50) {
@@ -96,14 +118,14 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     @Override
     public void onLongPress(MotionEvent arg0) {
 
-        // TODO Auto-generated method stub
+        // unused
 
     }
 
     @Override
     public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2, float arg3) {
 
-        // TODO Auto-generated method stub
+        // unused
 
         return false;
     }
@@ -111,14 +133,14 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     @Override
     public void onShowPress(MotionEvent arg0) {
 
-        // TODO Auto-generated method stub
+        // unused
 
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent arg0) {
 
-        // TODO Auto-generated method stub
+        // unused
 
         return false;
     }
@@ -126,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
 
-        // TODO Auto-generated method stub
+        // unused
 
         return gestureDetector.onTouchEvent(motionEvent);
     }
@@ -134,12 +156,13 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     @Override
     public boolean onDown(MotionEvent arg0) {
 
-        // TODO Auto-generated method stub
+        // unused
 
         return false;
     }
 
     public void changeBackground(int counter) {
+        //Display background and drawable when called from onFling method
         mMoods = mMoodTable[counter];
         mSmileyView.setImageResource(mMoods.getDrawableId());
         mRelativeLayout.setBackgroundColor(getResources().getColor(mMoods.getColorId()));
