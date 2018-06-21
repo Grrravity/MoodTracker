@@ -1,23 +1,27 @@
 package com.happyapp.grrravity.moodtracker.Controller;
 
+import android.annotation.SuppressLint;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.view.GestureDetector.OnGestureListener;
+import android.widget.TextView;
+
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Type;
 
 import com.happyapp.grrravity.moodtracker.Model.Moods;
 import com.happyapp.grrravity.moodtracker.R;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements OnGestureListener {
 
@@ -25,7 +29,8 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
     //layout-relative vars
     private ImageView mSmileyView;
-    private ImageButton mImageButtonComment, mImageButtonHistory;
+    private ImageButton mCommentButton, mHistoryButton;
+    private TextView mCommentText;
     private RelativeLayout mRelativeLayout;
 
     //Mood object relative vars
@@ -39,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     GestureDetector gestureDetector;
 
     //other vars
+String mComment;
     private int counter = 2;
     private Gson gson;
 
@@ -57,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
         //initiation of mood list
         initMoodList();
+
+        //method to add comment if clicked on comment button.
+        commentListener();
 
     }
 
@@ -81,12 +90,54 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
     }
 
+    private void commentListener(){
+        mCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder mBuilder = new AlertDialog.Builder
+                        (MainActivity.this);
+                @SuppressLint("InflateParams") final View mView = getLayoutInflater().inflate
+                        (R.layout.dialog_input, null);
+                final EditText mCommentInput = mView.findViewById(R.id.comment);
+
+                final Button mOkButton = mView.findViewById(R.id.ok_button);
+                Button mCancelButton = mView.findViewById(R.id.cancel_button);
+
+                mBuilder.setView(mView);
+
+                final AlertDialog dialog = mBuilder.create();
+                dialog.show();
+
+                mOkButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mComment = mCommentInput.getText().toString();
+                        mMoods = moods.get(counter);
+                        mMoods.setComment(String.valueOf(mComment));
+                        mCommentText.setText(mComment);
+                        mCommentText.setVisibility(View.VISIBLE);
+                        dialog.cancel();
+                    }
+                });
+
+                mCancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.cancel();
+                    }
+                });
+
+            }
+        });
+    }
+
     private void initVars() {
         //Connecting layout element by id
         mSmileyView = findViewById(R.id.smileyImage);
         mRelativeLayout = findViewById(R.id.relativeLayout);
-        mImageButtonComment = findViewById(R.id.comment_button);
-        mImageButtonHistory = findViewById(R.id.history_button);
+        mCommentButton = findViewById(R.id.comment_button);
+        mHistoryButton = findViewById(R.id.history_button);
+        mCommentText = findViewById(R.id.main_comment_text);
     }
 
     // Method to change image and background when user moves up or down

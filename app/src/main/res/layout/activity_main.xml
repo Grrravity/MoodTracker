@@ -18,6 +18,21 @@
         android:layout_centerVertical="true"
         />
 
+    <TextView
+        android:id="@+id/main_comment_text"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="@string/testcomment"
+        android:visibility="gone"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_below="@+id/smileyImage"
+        />
+
     <ImageButton
         android:id="@+id/comment_button"
         android:src="@drawable/ic_note_add_black"
