@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MoodTracker</string>
+    <string name="empty_comment">empty comment</string>
 </resources>

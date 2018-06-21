@@ -12,4 +12,7 @@
     <color name="color_happy">#ffb8e986</color>
     <color name="color_super_happy">#fff9ec4f</color>
 
+    <!-- Background color for history activity -->
+    <color name="light_white">#FAF0E6</color>
+
 </resources>

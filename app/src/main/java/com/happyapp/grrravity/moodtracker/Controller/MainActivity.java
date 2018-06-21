@@ -9,9 +9,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.view.GestureDetector.OnGestureListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 
 import com.happyapp.grrravity.moodtracker.Model.Moods;
 import com.happyapp.grrravity.moodtracker.R;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements OnGestureListener {
 
@@ -23,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     private RelativeLayout mRelativeLayout;
 
     //Mood object relative vars
-    private Moods[] mMoodTable;
+    private ArrayList<Moods> moods;
     private Moods mMoods;
 
     //SharedPrefs vars
@@ -34,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
     //other vars
     private int counter = 2;
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,29 +58,26 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         //initiation of mood list
         initMoodList();
 
-
-
     }
 
     private void initMoodList() {
         //Creating every moods with their assets (background, drawable, comment and name
-        mMoodTable = new Moods[]{
-                new Moods("Sad",
+        moods = new ArrayList<>();
+                moods.add (new Moods("Sad",
                         R.drawable.smileysad, R.color.color_sad, 0,
-                        ""),
-                new Moods("Disappointed",
+                        ""));
+                moods.add (new Moods("Disappointed",
                         R.drawable.smileydisappointed, R.color.color_disappointed, 1,
-                        ""),
-                new Moods("Normal",
+                        ""));
+                moods.add (new Moods("Normal",
                         R.drawable.smileynormal, R.color.color_normal, 2,
-                        ""),
-                new Moods("Happy",
+                        ""));
+                moods.add (new Moods("Happy",
                         R.drawable.smileyhappy, R.color.color_happy, 3,
-                        ""),
-                new Moods("SuperHappy",
+                        ""));
+                moods.add (new Moods("SuperHappy",
                         R.drawable.smileysuperhappy, R.color.color_super_happy, 4,
-                        ""),
-        };
+                        ""));
 
     }
 
@@ -163,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
     public void changeBackground(int counter) {
         //Display background and drawable when called from onFling method
-        mMoods = mMoodTable[counter];
+        mMoods = moods.get(counter);
         mSmileyView.setImageResource(mMoods.getDrawableId());
         mRelativeLayout.setBackgroundColor(getResources().getColor(mMoods.getColorId()));
     }
