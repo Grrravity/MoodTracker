@@ -1,6 +1,4 @@
-package com.happyapp.grrravity.moodtracker.Model;
-
-import java.util.List;
+package com.happyapp.grrravity.moodtracker.model;
 
 public class Moods {
     private String name;
@@ -8,6 +6,7 @@ public class Moods {
     private int colorId;
     private int index;
     private String comment;
+    private String date;
 
     public Moods(String name, int drawableId, int colorId, int index, String comment) {
         this.name = name;
@@ -57,6 +56,14 @@ public class Moods {
         this.comment = comment;
     }
 
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     @Override
     public String toString(){
         return "Moods{"+
@@ -65,6 +72,7 @@ public class Moods {
                 ", colorId = " + colorId +
                 ", index = " + index +
                 ", comment" + comment +
+                ", dateInMs" + date +
                 "}";
     }
 }

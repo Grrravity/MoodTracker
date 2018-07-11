@@ -5,5 +5,7 @@
     <string name="ok">Ok</string>
     <string name="erase">Erase</string>
     <string name="cancel">Cancel</string>
-    <string name="testcomment">one comment one comment one commentone comment one comment one commentone comment one comment one comment</string>
+    <string name="testcomment">one comment one comment one comment one comment one comment one comment one comment one comment one comment</string>
+    <string name="todo">TODO</string>
+    <string name="empty_date">empty date</string>
 </resources>
