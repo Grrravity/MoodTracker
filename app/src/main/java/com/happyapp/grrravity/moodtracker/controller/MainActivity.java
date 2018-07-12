@@ -16,17 +16,20 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.view.GestureDetector.OnGestureListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
 import com.happyapp.grrravity.moodtracker.model.Moods;
 import com.happyapp.grrravity.moodtracker.R;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements OnGestureListener {
 
@@ -79,6 +82,43 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         commentListener();
         historyButton();
 
+        //save missing day if any
+        saveMissingDays();
+
+    }
+
+    private void saveMissingDays() {
+        // Current time
+        Long d = mCalendar.getTimeInMillis();
+        ArrayList<Moods> storedMood = mPref.getMoods();
+        String lastDate = storedMood.get(storedMood.size() - 1).getDate();
+        // Set your date format String
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        try {
+            Date mDate = sdf.parse(lastDate);
+            long timeInMilliseconds = mDate.getTime();
+            long msDiff = d - timeInMilliseconds;
+            long daysDiff = TimeUnit.MILLISECONDS.toDays(msDiff);
+            if (daysDiff > 0) {
+                for (long test = daysDiff; test > 0; test--) {
+                    storedMood.add(new Moods(
+                            (storedMood.get(storedMood.size() - 1).getName()),
+                            (storedMood.get(storedMood.size() - 1).getDrawableId()),
+                            (storedMood.get(storedMood.size() - 1).getColorId()),
+                            (storedMood.get(storedMood.size() - 1).getIndex()),
+                            (storedMood.get(storedMood.size() - 1).getComment())));
+                }
+                mPref.storeMoods(storedMood);
+                Toast.makeText(this, "Humeurs mises à jour", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(this, "Humeurs à jour", Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initMoodList() {
