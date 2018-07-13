@@ -40,17 +40,6 @@ public class MoodPreferences {
         editor.apply();
     }
 
-    public void addMoods(ArrayList<Moods> moods){
-        SharedPreferences.Editor editor = moodPrefs.edit();
-        String storedMoods = moodPrefs.getString(MOODPREFS, "");
-        //put the data
-        Gson gson = new Gson();
-        String json = gson.toJson(storedMoods + ", " + moods);
-        editor.putString(MOODPREFS, json);
-        //close the file
-        editor.apply();
-    }
-
     public ArrayList<Moods> getMoods() {
         Gson gson = new Gson();
         String json = moodPrefs.getString(MOODPREFS, "");

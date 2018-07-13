@@ -1,7 +1,5 @@
 package com.happyapp.grrravity.moodtracker.controller;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -45,17 +43,16 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
         String moodDate = mSavedMoods.get(position).getDate();
 
         holder.date.setText(moodDate);
-        if (mSavedMoods.get(position).getComment() != null) {
-            holder.commentButton.setVisibility(View.VISIBLE);
-        }
+
+        // TODO changer nom variable pour comprendre mieux.
         DisplayMetrics metrics = holder.itemView.getContext().getResources().getDisplayMetrics();
         float dp = (90 * (mSavedMoods.get(position).getIndex() + 1));
         float fpixels = metrics.density * dp;
-        int pixels = (int) (fpixels + 0.5f);
+        int pixels = (int) (fpixels + 0.5);
         holder.barBackground.setBackgroundColor
                 (holder.itemView.getResources().getColor(mSavedMoods.get(position).getColorId()));
         holder.barBackground.setLayoutParams
-                (new RelativeLayout.LayoutParams( pixels, (int)((metrics.density * 80)+0.5f)));
+                (new RelativeLayout.LayoutParams( pixels, (int)((metrics.density * 80)+0.5)));
 
     }
 
@@ -63,15 +60,19 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
 
         display(mSavedMoods, holder.getAdapterPosition(), holder);
+        if (mSavedMoods.get(position).getComment().equals ("")){
+            holder.commentButton.setVisibility(View.GONE);
+        }
+        else {
+            holder.commentButton.setOnClickListener(new View.OnClickListener() {
 
-        holder.commentButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(v.getContext(), mSavedMoods.get
-                        (holder.getAdapterPosition()).getComment(), Toast.LENGTH_LONG).show();
-            }
-        });
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), mSavedMoods.get
+                            (holder.getAdapterPosition()).getComment(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

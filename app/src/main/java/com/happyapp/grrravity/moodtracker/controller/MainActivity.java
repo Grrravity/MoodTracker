@@ -18,8 +18,6 @@ import android.view.GestureDetector.OnGestureListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import com.happyapp.grrravity.moodtracker.model.Moods;
 import com.happyapp.grrravity.moodtracker.R;
 
@@ -59,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     //other vars
     String mComment;
     private int counter = 2;
-    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,9 +92,12 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         // Set your date format String
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
+        // TODO gerer si il y a plus de 8 jours.
+        // TODO utilier une meme fonction pour verrifier si plus de 8 jours. voir depuis saveData()
+
         try {
-            Date mDate = sdf.parse(lastDate);
-            long timeInMilliseconds = mDate.getTime();
+            Date date = sdf.parse(lastDate);
+            long timeInMilliseconds = date.getTime();
             long msDiff = d - timeInMilliseconds;
             long daysDiff = TimeUnit.MILLISECONDS.toDays(msDiff);
             if (daysDiff > 0) {
@@ -111,8 +111,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
                 }
                 mPref.storeMoods(storedMood);
                 Toast.makeText(this, "Humeurs mises à jour", Toast.LENGTH_SHORT).show();
-            }
-            else {
+            } else {
                 Toast.makeText(this, "Humeurs à jour", Toast.LENGTH_SHORT).show();
             }
 
@@ -121,8 +120,11 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         }
     }
 
+    /**
+     *  Creating every moods with their assets (background, drawable, comment and name...)
+     */
     private void initMoodList() {
-        //Creating every moods with their assets (background, drawable, comment and name...)
+
         // TODO renome mMoods or qqch
         moods = new ArrayList<>();
         moods.add(new Moods("Sad",
@@ -303,7 +305,6 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
     public void saveData() {
         //save the mood. If there's already another mood stored, add it without overwrite instead
-        // TODO add calendar value to store only 1 mood a day
 
         Date d = mCalendar.getTime(); // Current time
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); // Set your date format String
@@ -322,8 +323,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
                     storedMood.remove(storedMood.size() - 1);
                 }
-            }
-            else {
+            } else {
                 storedMood.remove(0);
             }
             // NPA managed in moodPref

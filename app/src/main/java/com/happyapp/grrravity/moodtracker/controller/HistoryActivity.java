@@ -11,9 +11,6 @@ import com.happyapp.grrravity.moodtracker.model.Moods;
 import java.util.ArrayList;
 
 public class HistoryActivity extends AppCompatActivity{
-    private RecyclerView mRecyclerView;
-    private ArrayList<Moods> moods = new ArrayList<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -22,10 +19,10 @@ public class HistoryActivity extends AppCompatActivity{
 
         ArrayList<Moods> moods = MoodPreferences.getInstance(this).getMoods();
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        RecyclerView recyclerView = findViewById(R.id.list);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(new HistoryAdapter(moods));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new HistoryAdapter(moods));
     }
 
 }

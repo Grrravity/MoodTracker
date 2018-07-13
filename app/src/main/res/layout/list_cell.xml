@@ -9,7 +9,7 @@
 
     <ImageButton
         android:id="@+id/history_comment_imageButton"
-        android:src="@drawable/ic_note_add_black"
+        android:src="@drawable/ic_comment_black_48px"
         android:contentDescription="@string/todo"
         android:layout_width="40dp"
         android:layout_height="40dp"
