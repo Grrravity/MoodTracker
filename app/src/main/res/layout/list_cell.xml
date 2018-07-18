@@ -9,15 +9,19 @@
 
     <ImageButton
         android:id="@+id/history_comment_imageButton"
-        android:src="@drawable/ic_comment_black_48px"
-        android:contentDescription="@string/todo"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="15dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
         android:background="@null"
+        android:contentDescription="@string/todo"
+        android:foregroundGravity="bottom"
         android:scaleType="fitStart"
+        android:src="@drawable/ic_comment_black_48px"
         android:visibility="visible"
         />
 

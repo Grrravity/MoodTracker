@@ -33,24 +33,24 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    //layout-relative vars
+    //Layout vars
     private ImageView mSmileyView;
-    private ImageButton mCommentButton, mHistoryButton;
+    private ImageButton mCommentButton, mHistoryButton, mShareButton, mResetButton;
     private TextView mCommentText;
     private RelativeLayout mRelativeLayout;
 
-    //Mood object relative vars
+    //Mood object vars
     private ArrayList<Moods> moods;
     private Moods mMoods;
 
     //SharedPrefs vars
     private MoodPreferences mPref;
 
-    //gesture detector
+    //Gesture detector (change OnFling_Sensibility to change in app gesture sensibility)
     GestureDetector gestureDetector;
     final int ONFLING_SENSIBILITY = 50;
 
-    //calendar
+    //Calendar
     Calendar mCalendar = Calendar.getInstance();
 
 
@@ -66,51 +66,37 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         mPref = MoodPreferences.getInstance(this);
         gestureDetector = new GestureDetector(this, this);
 
-
         Log.d(TAG, "onCreate: ");
 
-        //initiation of xml vars
         initVars();
-
-        //initiation of mood list
         initMoodList();
-
-        //method to add comment or to launch History activity
         commentListener();
+        shareListener();
         historyButton();
-
-        //save missing day if any
-        saveMissingDays();
+        resetButton();
 
     }
 
+    /**
+     * Use mood saved in SharedPreference to compare current date with the last saved. If there is
+     * any missing day, it will save them by coping the last mood saved.
+     */
     private void saveMissingDays() {
         // Current time
-        Long d = mCalendar.getTimeInMillis();
+        Long currentDate = mCalendar.getTimeInMillis();
         ArrayList<Moods> storedMood = mPref.getMoods();
-        String lastDate = storedMood.get(storedMood.size() - 1).getDate();
-        // Set your date format String
+        String dateFromMood = storedMood.get(storedMood.size() - 1).getDate();
+        // Set date format String
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-        // TODO gerer si il y a plus de 8 jours.
-        // TODO utilier une meme fonction pour verrifier si plus de 8 jours. voir depuis saveData()
-
         try {
-            Date date = sdf.parse(lastDate);
-            long timeInMilliseconds = date.getTime();
-            long msDiff = d - timeInMilliseconds;
-            long daysDiff = TimeUnit.MILLISECONDS.toDays(msDiff);
+            Date lastDate = sdf.parse(dateFromMood);
+            long lastDateInMs = lastDate.getTime();
+            long timeDiff = currentDate - lastDateInMs;
+            long daysDiff = TimeUnit.MILLISECONDS.toDays(timeDiff);
+
             if (daysDiff > 0) {
-                for (long test = daysDiff; test > 0; test--) {
-                    storedMood.add(new Moods(
-                            (storedMood.get(storedMood.size() - 1).getName()),
-                            (storedMood.get(storedMood.size() - 1).getDrawableId()),
-                            (storedMood.get(storedMood.size() - 1).getColorId()),
-                            (storedMood.get(storedMood.size() - 1).getIndex()),
-                            (storedMood.get(storedMood.size() - 1).getComment())));
-                }
-                mPref.storeMoods(storedMood);
-                Toast.makeText(this, "Humeurs mises à jour", Toast.LENGTH_SHORT).show();
+                fillingMoodList((int) daysDiff, storedMood, lastDate);
             } else {
                 Toast.makeText(this, "Humeurs à jour", Toast.LENGTH_SHORT).show();
             }
@@ -120,30 +106,57 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         }
     }
 
+    private void fillingMoodList(int counter, ArrayList<Moods> storedMood, Date lastDate) {
+        Date testDate = lastDate;
+        for (int test = counter; test > 1; test--) {
+            storedMood.add(new Moods(
+                    (storedMood.get(storedMood.size() - 1).getName()),
+                    (storedMood.get(storedMood.size() - 1).getDrawableId()),
+                    (storedMood.get(storedMood.size() - 1).getColorId()),
+                    (storedMood.get(storedMood.size() - 1).getIndex()),
+                    "// auto-filled mood //"));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            mCalendar.setTime(testDate);
+            mCalendar.add(Calendar.DATE, 1);
+            storedMood.get(storedMood.size() - 1).setDate(sdf.format(mCalendar.getTime()));
+            testDate = mCalendar.getTime();
+        }
+        if (storedMood.size() > 7) {
+            for (int test2 = storedMood.size(); test2 > 7; test2 --){
+                storedMood.remove(0);
+            }
+        }
+        mPref.storeMoods(storedMood);
+
+
+        Toast.makeText(this, "Humeurs mises à jour", Toast.LENGTH_SHORT).show();
+        mCalendar.setTime(Calendar.getInstance().getTime());
+    }
+
     /**
-     *  Creating every moods with their assets (background, drawable, comment and name...)
+     * Creating every moods with their assets (background, drawable, comment and name...)
      */
     private void initMoodList() {
 
         // TODO renome mMoods or qqch
         moods = new ArrayList<>();
-        moods.add(new Moods("Sad",
+        moods.add(new Moods("Triste",
                 R.drawable.smileysad, R.color.color_sad, 0,
                 ""));
-        moods.add(new Moods("Disappointed",
+        moods.add(new Moods("Déçu",
                 R.drawable.smileydisappointed, R.color.color_disappointed, 1,
                 ""));
-        moods.add(new Moods("Normal",
+        moods.add(new Moods("Bien",
                 R.drawable.smileynormal, R.color.color_normal, 2,
                 ""));
-        moods.add(new Moods("Happy",
+        moods.add(new Moods("Heureux",
                 R.drawable.smileyhappy, R.color.color_happy, 3,
                 ""));
-        moods.add(new Moods("SuperHappy",
+        moods.add(new Moods("Très heureux",
                 R.drawable.smileysuperhappy, R.color.color_super_happy, 4,
                 ""));
 
-        mMoods = new Moods("Normal",
+        mMoods = new Moods("Bien",
                 R.drawable.smileynormal, R.color.color_normal, 2,
                 "");
     }
@@ -155,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         mCommentButton = findViewById(R.id.comment_button);
         mHistoryButton = findViewById(R.id.history_button);
         mCommentText = findViewById(R.id.main_comment_text);
+        mShareButton = findViewById(R.id.share_button);
+        mResetButton = findViewById(R.id.reset_button);
 
     }
 
@@ -205,15 +220,61 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         });
     }
 
+    private void shareListener() {
+        //method to add a comment when comment button is clicked. Set the text visible on
+        //MainActivity if it's not empty.
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                if (mMoods.getComment().equals("") || mMoods.getComment() == null) {
+                    sendIntent.putExtra(Intent.EXTRA_TEXT,
+                            "Salut ! Je te partage mon ressentis car je suis " +
+                                    mMoods.getName() +
+                                    "." +
+                                    "\r\n -- Message envoyé depuis mon application MoodTracker");
+                } else {
+                    sendIntent.putExtra(Intent.EXTRA_TEXT,
+                            "Salut ! Je te partage mon ressentis car je suis " +
+                                    mMoods.getName() +
+                                    "; et j'ai d'ailleurs pensé ça de ma journée : " +
+                                    mMoods.getComment() +
+                                    "\r\n -- Message envoyé depuis mon application MoodTracker --");
+                }
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+            }
+        });
+    }
+
     private void historyButton() {
-        saveData();
+
         mHistoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                saveMissingDays();
+                saveData();
                 Intent historyActivity = new Intent
                         (MainActivity.this, HistoryActivity.class);
                 startActivity(historyActivity);
+            }
+
+        });
+    }
+
+    private void resetButton() {
+        mResetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMoods.setDate("2018-07-05");
+                mMoods.setComment("## auto-added comment on reset value ##");
+                ArrayList<Moods> storedMood = mPref.getMoods();
+                storedMood.clear();
+                storedMood.add(mMoods);
+                mPref.storeMoods(storedMood);
+                mMoods.setDate("");
+                mMoods.setComment("");
             }
 
         });
@@ -317,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
 
         if (storedMood != null && storedMood.size() > 0) {
-            if (storedMood.size() < 8) {
+            if (storedMood.size() < 9) {
                 String storedDate = String.valueOf(storedMood.get(storedMood.size() - 1).getDate());
                 if (storedDate.equals(currentDate)) {
 
@@ -336,6 +397,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     @Override
     protected void onPause() {
         super.onPause();
+        saveMissingDays();
         saveData();
         Log.d(TAG, "onPause :");
     }

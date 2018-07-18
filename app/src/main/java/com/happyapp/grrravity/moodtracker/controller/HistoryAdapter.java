@@ -11,17 +11,27 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+
 import com.happyapp.grrravity.moodtracker.R;
 import com.happyapp.grrravity.moodtracker.model.Moods;
 
-import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHolder> {
 
 
     private ArrayList<Moods> mSavedMoods;
 
-    public HistoryAdapter(ArrayList<Moods> mSavedMoods){
+    public HistoryAdapter(ArrayList<Moods> mSavedMoods) {
         this.mSavedMoods = mSavedMoods;
     }
 
@@ -41,8 +51,23 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
     private void display(ArrayList<Moods> mSavedMoods, int position, MyViewHolder holder) {
 
         String moodDate = mSavedMoods.get(position).getDate();
+        Long currentDate = holder.mCalendar.getTimeInMillis();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-        holder.date.setText(moodDate);
+        try {
+            Date lastDate = sdf.parse(moodDate);
+            long lastDateInMs = lastDate.getTime();
+            long timeDiff = currentDate - lastDateInMs;
+            long daysDiff = TimeUnit.MILLISECONDS.toDays(timeDiff);
+            String dayShown[] = {"Aujourd'hui", "Hier", "Avant-hier", "Il y a trois jours",
+                    "Il y a quatre jours", "Il y a cinq jours", "Il y a six jours",
+                    "Il y a une semaine"};
+            holder.date.setText(dayShown[(int) daysDiff]);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
 
         // TODO changer nom variable pour comprendre mieux.
         DisplayMetrics metrics = holder.itemView.getContext().getResources().getDisplayMetrics();
@@ -52,7 +77,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
         holder.barBackground.setBackgroundColor
                 (holder.itemView.getResources().getColor(mSavedMoods.get(position).getColorId()));
         holder.barBackground.setLayoutParams
-                (new RelativeLayout.LayoutParams( pixels, (int)((metrics.density * 80)+0.5)));
+                (new RelativeLayout.LayoutParams(pixels, (int) ((metrics.density * 80) + 0.5)));
 
     }
 
@@ -60,10 +85,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
 
         display(mSavedMoods, holder.getAdapterPosition(), holder);
-        if (mSavedMoods.get(position).getComment().equals ("")){
+        if (mSavedMoods.get(position).getComment().equals("")) {
             holder.commentButton.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             holder.commentButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -80,6 +104,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
         private TextView date;
         private ImageButton commentButton;
         private RelativeLayout barBackground;
+        private Calendar mCalendar = Calendar.getInstance();
 
 
         private MyViewHolder(final View itemView) {
