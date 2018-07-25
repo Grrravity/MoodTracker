@@ -1,7 +1,12 @@
 package com.happyapp.grrravity.moodtracker.controller;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,7 +40,9 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
     //Layout vars
     private ImageView mSmileyView;
-    private ImageButton mCommentButton, mHistoryButton, mShareButton, mResetButton;
+    private ImageButton mCommentButton;
+    private ImageButton mHistoryButton;
+    private ImageButton mShareButton;
     private TextView mCommentText;
     private RelativeLayout mRelativeLayout;
 
@@ -65,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         setContentView(R.layout.activity_main);
         mPref = MoodPreferences.getInstance(this);
         gestureDetector = new GestureDetector(this, this);
-
         Log.d(TAG, "onCreate: ");
 
         initVars();
@@ -73,30 +79,59 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         commentListener();
         shareListener();
         historyButton();
-        resetButton();
+        initAlarmManager();
+
+    }
+
+    private void initAlarmManager() {
+        //alarm manager for save
+        Calendar midnightCalendar = Calendar.getInstance();
+        midnightCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        midnightCalendar.set(Calendar.MINUTE, 0);
+        midnightCalendar.set(Calendar.SECOND, 0);
+
+        BroadcastReceiver br = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context c, Intent i) {
+                saveMissingDay();
+            }
+        };
+        registerReceiver(br, new IntentFilter(
+                "com.happyapp.grrravity.moodtracker.controller.MainActivity"));
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        PendingIntent midnightPI = PendingIntent.getBroadcast(this,
+                0,
+                new Intent("com.happyapp.grrravity.moodtracker.controller.MainActivity"),
+                0);
+
+        assert alarmManager != null;
+        alarmManager.setRepeating(AlarmManager.RTC,
+                midnightCalendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY,
+                midnightPI);
 
     }
 
     /**
      * Use mood saved in SharedPreference to compare current date with the last saved. If there is
-     * any missing day, it will save them by coping the last mood saved.
+     * any missing day, it will save them by copying the last mood saved.
      */
-    private void saveMissingDays() {
-        // Current time
+    private void saveMissingDay() {
+
         Long currentDate = mCalendar.getTimeInMillis();
         ArrayList<Moods> storedMood = mPref.getMoods();
         String dateFromMood = storedMood.get(storedMood.size() - 1).getDate();
-        // Set date format String
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
         try {
-            Date lastDate = sdf.parse(dateFromMood);
-            long lastDateInMs = lastDate.getTime();
-            long timeDiff = currentDate - lastDateInMs;
-            long daysDiff = TimeUnit.MILLISECONDS.toDays(timeDiff);
+            Date storedDate = sdf.parse(dateFromMood);
+            long storedTime = storedDate.getTime();
+            long timeGap = currentDate - storedTime;
+            long daysGap = TimeUnit.MILLISECONDS.toDays(timeGap);
 
-            if (daysDiff > 0) {
-                fillingMoodList((int) daysDiff, storedMood, lastDate);
+            if (daysGap > 0) {
+                fillingMoodList(storedMood, storedDate);
             } else {
                 Toast.makeText(this, "Humeurs à jour", Toast.LENGTH_SHORT).show();
             }
@@ -106,35 +141,46 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         }
     }
 
-    private void fillingMoodList(int counter, ArrayList<Moods> storedMood, Date lastDate) {
-        Date testDate = lastDate;
-        for (int test = counter; test > 1; test--) {
-            storedMood.add(new Moods(
-                    (storedMood.get(storedMood.size() - 1).getName()),
-                    (storedMood.get(storedMood.size() - 1).getDrawableId()),
-                    (storedMood.get(storedMood.size() - 1).getColorId()),
-                    (storedMood.get(storedMood.size() - 1).getIndex()),
-                    "// auto-filled mood //"));
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            mCalendar.setTime(testDate);
-            mCalendar.add(Calendar.DATE, 1);
-            storedMood.get(storedMood.size() - 1).setDate(sdf.format(mCalendar.getTime()));
-            testDate = mCalendar.getTime();
-        }
+    /**
+     * @param storedMood : (ArrayList) mood list from MoodPreferences.java
+     * @param storedDate : (Date) date stored in the last MoodPreferences
+     *                   <p>
+     *                   First it fill storedMood list for every missing days and giving each of them a date.
+     *                   Then, if there's more than 7 element in storedMood, it will remove the older elements until
+     *                   the list is filled with 7 elements.
+     *                   Once done, it's being saved.
+     */
+    private void fillingMoodList(ArrayList<Moods> storedMood, Date storedDate) {
+
+        storedMood.add(new Moods(
+                (storedMood.get(storedMood.size() - 1).getName()),
+                (storedMood.get(storedMood.size() - 1).getDrawableId()),
+                (storedMood.get(storedMood.size() - 1).getColorId()),
+                (storedMood.get(storedMood.size() - 1).getIndex()),
+                "// auto-filled mood //"));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        mCalendar.setTime(storedDate);
+        mCalendar.add(Calendar.DATE, 1);
+        storedMood.get(storedMood.size() - 1).setDate(sdf.format(mCalendar.getTime()));
+
         if (storedMood.size() > 7) {
-            for (int test2 = storedMood.size(); test2 > 7; test2 --){
-                storedMood.remove(0);
-            }
+            storedMood.remove(0);
         }
         mPref.storeMoods(storedMood);
 
+        //TODO remove toast for final release
 
         Toast.makeText(this, "Humeurs mises à jour", Toast.LENGTH_SHORT).show();
         mCalendar.setTime(Calendar.getInstance().getTime());
     }
 
     /**
-     * Creating every moods with their assets (background, drawable, comment and name...)
+     * Creating every moods with their assets :
+     * name (String)
+     * drawable : (int) smiley ID
+     * color : (int) color ID
+     * index : (int) index of the mood  (from 0 to 4)
+     * comment : (String) user-added comment
      */
     private void initMoodList() {
 
@@ -161,21 +207,28 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
                 "");
     }
 
+    /**
+     * Connecting layout element by id
+     */
     private void initVars() {
-        //Connecting layout element by id
+
         mSmileyView = findViewById(R.id.smileyImage);
         mRelativeLayout = findViewById(R.id.relativeLayout);
+        mCommentText = findViewById(R.id.main_comment_text);
         mCommentButton = findViewById(R.id.comment_button);
         mHistoryButton = findViewById(R.id.history_button);
-        mCommentText = findViewById(R.id.main_comment_text);
         mShareButton = findViewById(R.id.share_button);
-        mResetButton = findViewById(R.id.reset_button);
-
     }
 
+    /**
+     * Method to add a comment when comment button is clicked. Set the text visible on
+     * MainActivity if comment is not empty.
+     * <p>
+     * It will provide an AlertDialog to enter the comment.
+     * Also, adding an empty comment in there will erase previous added comment.
+     */
     private void commentListener() {
-        //method to add a comment when comment button is clicked. Set the text visible on
-        //MainActivity if it's not empty.
+
         mCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -253,28 +306,10 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         mHistoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveMissingDays();
                 saveData();
                 Intent historyActivity = new Intent
                         (MainActivity.this, HistoryActivity.class);
                 startActivity(historyActivity);
-            }
-
-        });
-    }
-
-    private void resetButton() {
-        mResetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMoods.setDate("2018-07-05");
-                mMoods.setComment("## auto-added comment on reset value ##");
-                ArrayList<Moods> storedMood = mPref.getMoods();
-                storedMood.clear();
-                storedMood.add(mMoods);
-                mPref.storeMoods(storedMood);
-                mMoods.setDate("");
-                mMoods.setComment("");
             }
 
         });
@@ -378,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
 
         if (storedMood != null && storedMood.size() > 0) {
-            if (storedMood.size() < 9) {
+            if (storedMood.size() < 7) {
                 String storedDate = String.valueOf(storedMood.get(storedMood.size() - 1).getDate());
                 if (storedDate.equals(currentDate)) {
 
@@ -394,13 +429,12 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         }
     }
 
+
     @Override
     protected void onPause() {
         super.onPause();
-        saveMissingDays();
         saveData();
         Log.d(TAG, "onPause :");
     }
-
 
 }

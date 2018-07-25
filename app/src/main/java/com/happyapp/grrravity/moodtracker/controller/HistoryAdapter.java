@@ -23,9 +23,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.DAYS;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHolder> {
 
 
@@ -37,7 +34,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
 
     @Override
     public int getItemCount() {
-        return mSavedMoods.size();
+        return (mSavedMoods.size() -1);
     }
 
     @NonNull
@@ -53,13 +50,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
         String moodDate = mSavedMoods.get(position).getDate();
         Long currentDate = holder.mCalendar.getTimeInMillis();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
+// TODO retirer aujourd'hui
         try {
             Date lastDate = sdf.parse(moodDate);
             long lastDateInMs = lastDate.getTime();
             long timeDiff = currentDate - lastDateInMs;
             long daysDiff = TimeUnit.MILLISECONDS.toDays(timeDiff);
-            String dayShown[] = {"Aujourd'hui", "Hier", "Avant-hier", "Il y a trois jours",
+            String dayShown[] = {"Hier", "Avant-hier", "Il y a trois jours",
                     "Il y a quatre jours", "Il y a cinq jours", "Il y a six jours",
                     "Il y a une semaine"};
             holder.date.setText(dayShown[(int) daysDiff]);
@@ -77,7 +74,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
         holder.barBackground.setBackgroundColor
                 (holder.itemView.getResources().getColor(mSavedMoods.get(position).getColorId()));
         holder.barBackground.setLayoutParams
-                (new RelativeLayout.LayoutParams(pixels, (int) ((metrics.density * 80) + 0.5)));
+                (new RelativeLayout.LayoutParams(pixels, (int) ((metrics.density * 70) + 0.5)));
 
     }
 
@@ -85,9 +82,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
 
         display(mSavedMoods, holder.getAdapterPosition(), holder);
-        if (mSavedMoods.get(position).getComment().equals("")) {
+        if (mSavedMoods.get(position).getComment().equals ("")){
             holder.commentButton.setVisibility(View.GONE);
-        } else {
+        }
+        else {
             holder.commentButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
