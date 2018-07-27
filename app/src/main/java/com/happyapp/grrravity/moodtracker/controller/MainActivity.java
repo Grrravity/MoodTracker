@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     private ImageButton mCommentButton;
     private ImageButton mHistoryButton;
     private ImageButton mShareButton;
-    private TextView mCommentText;
     private RelativeLayout mRelativeLayout;
 
     //Mood object vars
@@ -81,6 +80,140 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
         historyButton();
         initAlarmManager();
 
+    }
+
+    /**
+     * Connecting layout element by id
+     */
+    private void initVars() {
+
+        mSmileyView = findViewById(R.id.smileyImage);
+        mRelativeLayout = findViewById(R.id.relativeLayout);
+        mCommentButton = findViewById(R.id.comment_button);
+        mHistoryButton = findViewById(R.id.history_button);
+        mShareButton = findViewById(R.id.share_button);
+    }
+
+    /**
+     * Creating every moods with their assets :
+     * name (String)
+     * drawable : (int) smiley ID
+     * color : (int) color ID
+     * index : (int) index of the mood  (from 0 to 4)
+     * comment : (String) user-added comment
+     */
+    private void initMoodList() {
+
+        // TODO renome mMoods or qqch
+        moods = new ArrayList<>();
+        moods.add(new Moods("Triste",
+                R.drawable.smileysad, R.color.color_sad, 0,
+                ""));
+        moods.add(new Moods("Déçu",
+                R.drawable.smileydisappointed, R.color.color_disappointed, 1,
+                ""));
+        moods.add(new Moods("Bien",
+                R.drawable.smileynormal, R.color.color_normal, 2,
+                ""));
+        moods.add(new Moods("Heureux",
+                R.drawable.smileyhappy, R.color.color_happy, 3,
+                ""));
+        moods.add(new Moods("Très heureux",
+                R.drawable.smileysuperhappy, R.color.color_super_happy, 4,
+                ""));
+
+        mMoods = new Moods("Bien",
+                R.drawable.smileynormal, R.color.color_normal, 2,
+                "");
+    }
+
+    /**
+     * Method to add a comment when comment button is clicked. Set the text visible on
+     * MainActivity if comment is not empty.
+     * <p>
+     * It will provide an AlertDialog to enter the comment.
+     * Also, adding an empty comment in there will erase previous added comment.
+     */
+    private void commentListener() {
+
+        mCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder mBuilder = new AlertDialog.Builder
+                        (MainActivity.this);
+                @SuppressLint("InflateParams") final View mView = getLayoutInflater().inflate
+                        (R.layout.dialog_input, null);
+                final EditText mCommentInput = mView.findViewById(R.id.comment);
+
+                final Button mOkButton = mView.findViewById(R.id.ok_button);
+                Button mCancelButton = mView.findViewById(R.id.cancel_button);
+
+                mBuilder.setView(mView);
+
+                final AlertDialog dialog = mBuilder.create();
+                dialog.show();
+
+                mOkButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mComment = mCommentInput.getText().toString();
+                        mMoods = moods.get(counter);
+                        mMoods.setComment(String.valueOf(mComment));
+                        dialog.cancel();
+                    }
+                });
+
+                mCancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.cancel();
+                    }
+                });
+
+            }
+        });
+    }
+
+    private void shareListener() {
+        //method to add a comment when comment button is clicked. Set the text visible on
+        //MainActivity if it's not empty.
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                if (mMoods.getComment().equals("") || mMoods.getComment() == null) {
+                    sendIntent.putExtra(Intent.EXTRA_TEXT,
+                            "Salut ! Je te partage mon ressentis car je suis " +
+                                    mMoods.getName() +
+                                    "." +
+                                    "\r\n -- Message envoyé depuis mon application MoodTracker");
+                } else {
+                    sendIntent.putExtra(Intent.EXTRA_TEXT,
+                            "Salut ! Je te partage mon ressentis car je suis " +
+                                    mMoods.getName() +
+                                    "; et j'ai d'ailleurs pensé ça de ma journée : " +
+                                    mMoods.getComment() +
+                                    "\r\n -- Message envoyé depuis mon application MoodTracker --");
+                }
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+            }
+        });
+    }
+
+    private void historyButton() {
+
+        mHistoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveData();
+                Intent historyActivity = new Intent
+                        (MainActivity.this, HistoryActivity.class);
+                startActivity(historyActivity);
+            }
+
+        });
     }
 
     private void initAlarmManager() {
@@ -157,162 +290,19 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
                 (storedMood.get(storedMood.size() - 1).getDrawableId()),
                 (storedMood.get(storedMood.size() - 1).getColorId()),
                 (storedMood.get(storedMood.size() - 1).getIndex()),
-                "// auto-filled mood //"));
+                ""));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        mCalendar.setTime(storedDate);
-        mCalendar.add(Calendar.DATE, 1);
-        storedMood.get(storedMood.size() - 1).setDate(sdf.format(mCalendar.getTime()));
+        Calendar fillingCalendar = Calendar.getInstance();
+        fillingCalendar.setTime(storedDate);
+        fillingCalendar.add(Calendar.DATE, 1);
+        storedMood.get(storedMood.size() - 1).setDate(sdf.format(fillingCalendar.getTime()));
 
         if (storedMood.size() > 7) {
             storedMood.remove(0);
         }
         mPref.storeMoods(storedMood);
 
-        //TODO remove toast for final release
-
         Toast.makeText(this, "Humeurs mises à jour", Toast.LENGTH_SHORT).show();
-        mCalendar.setTime(Calendar.getInstance().getTime());
-    }
-
-    /**
-     * Creating every moods with their assets :
-     * name (String)
-     * drawable : (int) smiley ID
-     * color : (int) color ID
-     * index : (int) index of the mood  (from 0 to 4)
-     * comment : (String) user-added comment
-     */
-    private void initMoodList() {
-
-        // TODO renome mMoods or qqch
-        moods = new ArrayList<>();
-        moods.add(new Moods("Triste",
-                R.drawable.smileysad, R.color.color_sad, 0,
-                ""));
-        moods.add(new Moods("Déçu",
-                R.drawable.smileydisappointed, R.color.color_disappointed, 1,
-                ""));
-        moods.add(new Moods("Bien",
-                R.drawable.smileynormal, R.color.color_normal, 2,
-                ""));
-        moods.add(new Moods("Heureux",
-                R.drawable.smileyhappy, R.color.color_happy, 3,
-                ""));
-        moods.add(new Moods("Très heureux",
-                R.drawable.smileysuperhappy, R.color.color_super_happy, 4,
-                ""));
-
-        mMoods = new Moods("Bien",
-                R.drawable.smileynormal, R.color.color_normal, 2,
-                "");
-    }
-
-    /**
-     * Connecting layout element by id
-     */
-    private void initVars() {
-
-        mSmileyView = findViewById(R.id.smileyImage);
-        mRelativeLayout = findViewById(R.id.relativeLayout);
-        mCommentText = findViewById(R.id.main_comment_text);
-        mCommentButton = findViewById(R.id.comment_button);
-        mHistoryButton = findViewById(R.id.history_button);
-        mShareButton = findViewById(R.id.share_button);
-    }
-
-    /**
-     * Method to add a comment when comment button is clicked. Set the text visible on
-     * MainActivity if comment is not empty.
-     * <p>
-     * It will provide an AlertDialog to enter the comment.
-     * Also, adding an empty comment in there will erase previous added comment.
-     */
-    private void commentListener() {
-
-        mCommentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final AlertDialog.Builder mBuilder = new AlertDialog.Builder
-                        (MainActivity.this);
-                @SuppressLint("InflateParams") final View mView = getLayoutInflater().inflate
-                        (R.layout.dialog_input, null);
-                final EditText mCommentInput = mView.findViewById(R.id.comment);
-
-                final Button mOkButton = mView.findViewById(R.id.ok_button);
-                Button mCancelButton = mView.findViewById(R.id.cancel_button);
-
-                mBuilder.setView(mView);
-
-                final AlertDialog dialog = mBuilder.create();
-                dialog.show();
-
-                mOkButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mComment = mCommentInput.getText().toString();
-                        mMoods = moods.get(counter);
-                        mMoods.setComment(String.valueOf(mComment));
-                        mCommentText.setText(mComment);
-                        if (mComment != null) {
-                            mCommentText.setVisibility(View.VISIBLE);
-                        } else {
-                            mCommentText.setVisibility(View.GONE);
-                        }
-                        dialog.cancel();
-                    }
-                });
-
-                mCancelButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.cancel();
-                    }
-                });
-
-            }
-        });
-    }
-
-    private void shareListener() {
-        //method to add a comment when comment button is clicked. Set the text visible on
-        //MainActivity if it's not empty.
-        mShareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                if (mMoods.getComment().equals("") || mMoods.getComment() == null) {
-                    sendIntent.putExtra(Intent.EXTRA_TEXT,
-                            "Salut ! Je te partage mon ressentis car je suis " +
-                                    mMoods.getName() +
-                                    "." +
-                                    "\r\n -- Message envoyé depuis mon application MoodTracker");
-                } else {
-                    sendIntent.putExtra(Intent.EXTRA_TEXT,
-                            "Salut ! Je te partage mon ressentis car je suis " +
-                                    mMoods.getName() +
-                                    "; et j'ai d'ailleurs pensé ça de ma journée : " +
-                                    mMoods.getComment() +
-                                    "\r\n -- Message envoyé depuis mon application MoodTracker --");
-                }
-                sendIntent.setType("text/plain");
-                startActivity(sendIntent);
-            }
-        });
-    }
-
-    private void historyButton() {
-
-        mHistoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveData();
-                Intent historyActivity = new Intent
-                        (MainActivity.this, HistoryActivity.class);
-                startActivity(historyActivity);
-            }
-
-        });
     }
 
     // Method to change image and background when user moves up or down
@@ -402,9 +392,9 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     public void saveData() {
         //save the mood. If there's already another mood stored, add it without overwrite instead
 
-        Date d = mCalendar.getTime(); // Current time
+        Date dateOnSave = mCalendar.getTime(); // Current time
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); // Set your date format String
-        String currentDate = sdf.format(d);
+        String currentDate = sdf.format(dateOnSave);
 
         //save current date in the running mMoods list.
         mMoods.setDate(currentDate);
@@ -413,14 +403,20 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
 
         if (storedMood != null && storedMood.size() > 0) {
-            if (storedMood.size() < 7) {
+            if (storedMood.size() < 8) {
                 String storedDate = String.valueOf(storedMood.get(storedMood.size() - 1).getDate());
                 if (storedDate.equals(currentDate)) {
 
                     storedMood.remove(storedMood.size() - 1);
                 }
             } else {
-                storedMood.remove(0);
+                String storedDate = String.valueOf(storedMood.get(storedMood.size() - 1).getDate());
+                if (storedDate.equals(currentDate)) {
+
+                    storedMood.remove(storedMood.size() - 1);
+                } else {
+                    storedMood.remove(0);
+                }
             }
             // NPA managed in moodPref
             storedMood.add(mMoods);

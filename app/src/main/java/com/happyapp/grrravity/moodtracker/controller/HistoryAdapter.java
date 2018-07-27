@@ -34,7 +34,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
 
     @Override
     public int getItemCount() {
-        return (mSavedMoods.size() -1);
+        return (mSavedMoods.size() - 1);
     }
 
     @NonNull
@@ -50,7 +50,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
         String moodDate = mSavedMoods.get(position).getDate();
         Long currentDate = holder.mCalendar.getTimeInMillis();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-// TODO retirer aujourd'hui
+
         try {
             Date lastDate = sdf.parse(moodDate);
             long lastDateInMs = lastDate.getTime();
@@ -65,16 +65,16 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
             e.printStackTrace();
         }
 
-
-        // TODO changer nom variable pour comprendre mieux.
         DisplayMetrics metrics = holder.itemView.getContext().getResources().getDisplayMetrics();
-        float dp = (90 * (mSavedMoods.get(position).getIndex() + 1));
-        float fpixels = metrics.density * dp;
-        int pixels = (int) (fpixels + 0.5);
+        double sizeList[] = {0.25, 0.375, 0.5, 0.75, 1};
+        int deviceWidth = metrics.widthPixels;
+        int deviceHeight = metrics.heightPixels;
+        int moodHeight = deviceHeight / 10;
+        int moodWidth = (int) (deviceWidth * sizeList[mSavedMoods.get(position).getIndex()]);
         holder.barBackground.setBackgroundColor
                 (holder.itemView.getResources().getColor(mSavedMoods.get(position).getColorId()));
         holder.barBackground.setLayoutParams
-                (new RelativeLayout.LayoutParams(pixels, (int) ((metrics.density * 70) + 0.5)));
+                (new RelativeLayout.LayoutParams(moodWidth, moodHeight));
 
     }
 
@@ -82,10 +82,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
 
         display(mSavedMoods, holder.getAdapterPosition(), holder);
-        if (mSavedMoods.get(position).getComment().equals ("")){
+        if (mSavedMoods.get(position).getComment().equals("")) {
             holder.commentButton.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             holder.commentButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
