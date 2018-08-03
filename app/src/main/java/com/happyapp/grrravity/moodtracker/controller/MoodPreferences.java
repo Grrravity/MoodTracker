@@ -13,25 +13,29 @@ import java.util.ArrayList;
 
 
 public class MoodPreferences {
-    private static MoodPreferences instance;
     private static String MOODPREFS = "MOODPEFS";
+    private static MoodPreferences mInstance;
 
-    private SharedPreferences moodPrefs;
+    private SharedPreferences mMoodPrefs;
 
     private MoodPreferences(Context context) {
 
-        moodPrefs = context.getSharedPreferences(MOODPREFS, Activity.MODE_PRIVATE);
+        mMoodPrefs = context.getSharedPreferences(MOODPREFS, Activity.MODE_PRIVATE);
     }
 
     public static MoodPreferences getInstance(Context context) {
-        if (instance == null)
-            instance = new MoodPreferences(context);
-        return instance;
+        if (mInstance == null)
+            mInstance = new MoodPreferences(context);
+        return mInstance;
     }
 
+    /**
+     * uses gson to store moods as an Arraylist of strings.
+     * @param moods    : lists of Moods objects.
+     */
     public void storeMoods(ArrayList<Moods> moods) {
         //start writing (open the file)
-        SharedPreferences.Editor editor = moodPrefs.edit();
+        SharedPreferences.Editor editor = mMoodPrefs.edit();
         //put the data
         Gson gson = new Gson();
         String json = gson.toJson(moods);
@@ -40,9 +44,13 @@ public class MoodPreferences {
         editor.apply();
     }
 
+    /**
+     * use gson to send back an ArrayList of Moods from String.
+     * @return     : ArrayList of moods stored.
+     */
     public ArrayList<Moods> getMoods() {
         Gson gson = new Gson();
-        String json = moodPrefs.getString(MOODPREFS, "");
+        String json = mMoodPrefs.getString(MOODPREFS, "");
 
         ArrayList<Moods> moods;
 

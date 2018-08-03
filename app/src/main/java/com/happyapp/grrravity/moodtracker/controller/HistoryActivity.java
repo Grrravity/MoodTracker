@@ -18,6 +18,9 @@ public class HistoryActivity extends AppCompatActivity{
         setContentView(R.layout.activity_history);
 
         ArrayList<Moods> moods = MoodPreferences.getInstance(this).getMoods();
+        if (moods.size() > 0) {
+            moods.remove(moods.size() -1);
+        }
 
         RecyclerView recyclerView = findViewById(R.id.list);
 

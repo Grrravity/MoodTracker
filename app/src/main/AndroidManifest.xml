@@ -20,6 +20,17 @@
         </activity>
         <activity android:name=".controller.HistoryActivity"
             android:screenOrientation="portrait"/>
+        <receiver android:name=".controller.broadcaster.AlarmReceiver" >
+
+            <intent-filter>
+
+                <action android:name="com.happyapp.grrravity.moodtracker.controller.broadcaster.AlarmReceiver" >
+
+                </action>
+
+            </intent-filter>
+
+        </receiver>
     </application>
 
 </manifest>

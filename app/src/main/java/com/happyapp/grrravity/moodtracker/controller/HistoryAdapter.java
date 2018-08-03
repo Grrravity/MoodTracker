@@ -34,7 +34,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
 
     @Override
     public int getItemCount() {
-        return (mSavedMoods.size() - 1);
+        return (mSavedMoods.size());
     }
 
     @NonNull
@@ -45,6 +45,19 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
         return new MyViewHolder(view);
     }
 
+    /**
+     * Display each mood element for each view.
+     * Show date substitution name for each day (from dayShown list)
+     * <p>
+     * List width and height are set with a % of the device total pixel regarding mood value.
+     * (happier the mood is, longer will be the width.
+     * Color also depends on each mood value.
+     *
+     * @param mSavedMoods : Mood list saved in SharedPreferences.
+     * @param position    : position in the list generation. Used as index in the Mood list to
+     *                    connect the right elements for each view.
+     * @param holder      : ViewHolder from inner MyViewOlder class.
+     */
     private void display(ArrayList<Moods> mSavedMoods, int position, MyViewHolder holder) {
 
         String moodDate = mSavedMoods.get(position).getDate();
@@ -59,7 +72,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
             String dayShown[] = {"Hier", "Avant-hier", "Il y a trois jours",
                     "Il y a quatre jours", "Il y a cinq jours", "Il y a six jours",
                     "Il y a une semaine"};
-            holder.date.setText(dayShown[(int) daysDiff]);
+            holder.date.setText(dayShown[(int) daysDiff - 1]);
 
         } catch (ParseException e) {
             e.printStackTrace();
