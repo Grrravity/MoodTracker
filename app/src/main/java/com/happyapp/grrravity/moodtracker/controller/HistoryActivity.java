@@ -10,16 +10,16 @@ import com.happyapp.grrravity.moodtracker.model.Moods;
 
 import java.util.ArrayList;
 
-public class HistoryActivity extends AppCompatActivity{
+public class HistoryActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
         ArrayList<Moods> moods = MoodPreferences.getInstance(this).getMoods();
         if (moods.size() > 0) {
-            moods.remove(moods.size() -1);
+            moods.remove(moods.size() - 1);
         }
 
         RecyclerView recyclerView = findViewById(R.id.list);

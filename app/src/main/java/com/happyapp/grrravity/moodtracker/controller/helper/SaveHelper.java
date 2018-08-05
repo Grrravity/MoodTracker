@@ -98,7 +98,6 @@ public class SaveHelper {
 
         ArrayList<Moods> storedMood = mPref.getMoods();
 
-
         if (storedMood != null && storedMood.size() > 0) {
             if (storedMood.size() < 8) {
                 String storedDate = String.valueOf(storedMood.get(storedMood.size() - 1).getDate());

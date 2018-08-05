@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
      * color : (int) color ID
      * index : (int) index of the mood  (from 0 to 4)
      * comment : (String) user-added comment
-     *
+     * <p>
      * set mMoods to normal value
      */
     private void initMoodList() {
@@ -174,15 +174,15 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
                 sendIntent.setAction(Intent.ACTION_SEND);
                 if (mMoods.getComment().equals("") || mMoods.getComment() == null) {
                     sendIntent.putExtra(Intent.EXTRA_TEXT,
-                            "Salut ! Je te partage mon ressentis car je suis " +
+                            "Salut ! Je te partage mon ressenti car je suis " +
                                     mMoods.getName() +
                                     "." +
                                     "\r\n -- Message envoyé depuis mon application MoodTracker");
                 } else {
                     sendIntent.putExtra(Intent.EXTRA_TEXT,
-                            "Salut ! Je te partage mon ressentis car je suis " +
+                            "Salut ! Je te partage mon ressenti car je suis " +
                                     mMoods.getName() +
-                                    "; et j'ai d'ailleurs pensé ça de ma journée : " +
+                                    "; et j'ai d'ailleurs retenu ça de ma journée : " +
                                     mMoods.getComment() +
                                     "\r\n -- Message envoyé depuis mon application MoodTracker --");
                 }
@@ -239,11 +239,11 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
      * Will use changeScreenDisplayed(); if true, sending (int) counter to change the screen
      * displayed.
      *
-     *  @param motionEvent1 : The first recorded event on screen (linked with its X and Y coordinate)
+     * @param motionEvent1 : The first recorded event on screen (linked with its X and Y coordinate)
      *                     used to get Delta on movement.
      * @param motionEvent2 : The second recorded event on screen. Same as motionEvent 1.
-     * @param X : unused param as we're only looking for up & down event.
-     * @param Y : Coordinate from up and down position on the screen.
+     * @param X            : unused param as we're only looking for up & down event.
+     * @param Y            : Coordinate from up and down position on the screen.
      * @return : true if Y Delta is higher than ONFLING_SENSIBILITY.
      */
     public boolean onFling(MotionEvent motionEvent1, MotionEvent motionEvent2, float X, float Y) {
@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
     }
 
     /**
-     *  Method to get Drawable ID and Color ID of the current mood, and displaying them on the
+     * Method to get Drawable ID and Color ID of the current mood, and displaying them on the
      * screen.
      *
      * @param counter : index value of the new mood called from OnFling(); method.

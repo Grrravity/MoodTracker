@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.happyapp.grrravity.moodtracker">
 
     <application
@@ -20,7 +21,8 @@
         </activity>
         <activity android:name=".controller.HistoryActivity"
             android:screenOrientation="portrait"/>
-        <receiver android:name=".controller.broadcaster.AlarmReceiver" >
+        <receiver android:name=".controller.broadcaster.AlarmReceiver"
+            tools:ignore="ExportedReceiver">
 
             <intent-filter>
 

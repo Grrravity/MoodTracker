@@ -31,7 +31,8 @@ public class MoodPreferences {
 
     /**
      * uses gson to store moods as an Arraylist of strings.
-     * @param moods    : lists of Moods objects.
+     *
+     * @param moods : lists of Moods objects.
      */
     public void storeMoods(ArrayList<Moods> moods) {
         //start writing (open the file)
@@ -46,7 +47,8 @@ public class MoodPreferences {
 
     /**
      * use gson to send back an ArrayList of Moods from String.
-     * @return     : ArrayList of moods stored.
+     *
+     * @return : ArrayList of moods stored.
      */
     public ArrayList<Moods> getMoods() {
         Gson gson = new Gson();

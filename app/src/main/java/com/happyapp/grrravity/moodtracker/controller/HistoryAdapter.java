@@ -69,10 +69,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
             long lastDateInMs = lastDate.getTime();
             long timeDiff = currentDate - lastDateInMs;
             long daysDiff = TimeUnit.MILLISECONDS.toDays(timeDiff);
-            String dayShown[] = {"Hier", "Avant-hier", "Il y a trois jours",
-                    "Il y a quatre jours", "Il y a cinq jours", "Il y a six jours",
-                    "Il y a une semaine"};
-            holder.date.setText(dayShown[(int) daysDiff - 1]);
+            if (daysDiff >= 0 && daysDiff < 7) {
+                String dayShown[] = {"Hier", "Avant-hier", "Il y a trois jours",
+                        "Il y a quatre jours", "Il y a cinq jours", "Il y a six jours",
+                        "Il y a une semaine"};
+                holder.date.setText(dayShown[(int) daysDiff - 1]);
+            } else {
+                holder.date.setText(mSavedMoods.get(position).getDate());
+            }
 
         } catch (ParseException e) {
             e.printStackTrace();

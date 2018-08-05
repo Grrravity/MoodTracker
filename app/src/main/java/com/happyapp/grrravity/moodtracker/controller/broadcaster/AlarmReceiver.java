@@ -7,7 +7,6 @@ import android.content.Intent;
 import com.happyapp.grrravity.moodtracker.controller.helper.SaveHelper;
 
 
-
 public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
