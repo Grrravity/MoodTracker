@@ -69,13 +69,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
             long lastDateInMs = lastDate.getTime();
             long timeDiff = currentDate - lastDateInMs;
             long daysDiff = TimeUnit.MILLISECONDS.toDays(timeDiff);
-            if (daysDiff >= 0 && daysDiff < 7) {
+            if (daysDiff >= 0 && daysDiff < 8) {
                 String dayShown[] = {"Hier", "Avant-hier", "Il y a trois jours",
                         "Il y a quatre jours", "Il y a cinq jours", "Il y a six jours",
                         "Il y a une semaine"};
                 holder.date.setText(dayShown[(int) daysDiff - 1]);
-            } else {
-                holder.date.setText(mSavedMoods.get(position).getDate());
             }
 
         } catch (ParseException e) {
@@ -83,10 +81,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.MyViewHo
         }
 
         DisplayMetrics metrics = holder.itemView.getContext().getResources().getDisplayMetrics();
-        double sizeList[] = {0.25, 0.375, 0.5, 0.75, 1};
+        double sizeList[] = {0.35, 0.45, 0.6, 0.85, 1};
         int deviceWidth = metrics.widthPixels;
         int deviceHeight = metrics.heightPixels;
-        int moodHeight = deviceHeight / 10;
+        int moodHeight = deviceHeight / 8;
         int moodWidth = (int) (deviceWidth * sizeList[mSavedMoods.get(position).getIndex()]);
         holder.barBackground.setBackgroundColor
                 (holder.itemView.getResources().getColor(mSavedMoods.get(position).getColorId()));
