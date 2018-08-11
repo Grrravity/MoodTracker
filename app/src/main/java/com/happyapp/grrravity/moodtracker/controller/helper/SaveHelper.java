@@ -62,8 +62,8 @@ public class SaveHelper {
      */
     private void fillingMoodList(ArrayList<Moods> storedMood, Date storedDate) {
 
-        storedMood.add(new Moods("Bien",
-                R.drawable.smileynormal, R.color.color_normal, 2,
+        storedMood.add(new Moods("Heureux",
+                R.drawable.smileyhappy, R.color.color_happy, 3,
                 ""));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Calendar fillingCalendar = Calendar.getInstance();
@@ -96,28 +96,31 @@ public class SaveHelper {
         //save current date in the running mMoods list.
         mMoods.setDate(currentDate);
 
-        ArrayList<Moods> storedMood = mPref.getMoods();
+        ArrayList<Moods> prefMood = mPref.getMoods();
 
-        if (storedMood != null && storedMood.size() > 0) {
-            if (storedMood.size() < 8) {
-                String storedDate = String.valueOf(storedMood.get(storedMood.size() - 1).getDate());
+        if (prefMood != null && prefMood.size() > 0) {
+            if (prefMood.size() < 8) {
+                String storedDate = String.valueOf(prefMood.get(prefMood.size() - 1).getDate());
                 if (storedDate.equals(currentDate)) {
 
-                    storedMood.remove(storedMood.size() - 1);
+                    prefMood.remove(prefMood.size() - 1);
                 }
             } else {
-                String storedDate = String.valueOf(storedMood.get(storedMood.size() - 1).getDate());
+                String storedDate = String.valueOf(prefMood.get(prefMood.size() - 1).getDate());
                 if (storedDate.equals(currentDate)) {
 
-                    storedMood.remove(storedMood.size() - 1);
+                    prefMood.remove(prefMood.size() - 1);
                 } else {
-                    storedMood.remove(0);
+                    prefMood.remove(0);
                 }
             }
             // NPA managed in moodPref
-            storedMood.add(mMoods);
-            mPref.storeMoods(storedMood);
+            prefMood.add(mMoods);
+            mPref.storeMoods(prefMood);
 
+        } else if (prefMood != null) {
+            prefMood.add(mMoods);
+            mPref.storeMoods(prefMood);
         }
     }
 

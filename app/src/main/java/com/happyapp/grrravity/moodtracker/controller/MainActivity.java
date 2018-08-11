@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
 
     //other vars
     String mComment;
-    private int counter = 2;
+    private int counter = 3;
     private SaveHelper mSaveHelper;
 
     @Override
@@ -108,8 +108,8 @@ public class MainActivity extends AppCompatActivity implements OnGestureListener
                 R.drawable.smileysuperhappy, R.color.color_super_happy, 4,
                 ""));
 
-        mMoods = new Moods("Bien",
-                R.drawable.smileynormal, R.color.color_normal, 2,
+        mMoods = new Moods("Heureux",
+                R.drawable.smileyhappy, R.color.color_happy, 3,
                 "");
     }
 
